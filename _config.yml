@@ -1,0 +1,20 @@
+title: Miles
+description: Writing about things that matter.
+author: quesswho
+url: "https://quesswho.github.io"
+baseurl: "/miles-blog"
+
+markdown: kramdown
+highlighter: rouge
+
+permalink: /:year/:month/:day/:title/
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .bundle
