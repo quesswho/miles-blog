@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+  {%- include head.html -%}
+  <body class="app-page">
+    {{ content }}
+    {%- if page.app_script -%}
+    <script src="{{ page.app_script | prepend: site.baseurl }}" defer></script>
+    {%- endif -%}
+  </body>
+</html>

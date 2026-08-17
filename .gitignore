@@ -5,3 +5,7 @@ _site/
 vendor/
 .bundle/
 Gemfile.lock
+
+# Build toolchain for _src (fetched on demand by _src/build.sh)
+_src/.cache/
+_src/node_modules/
