@@ -4,7 +4,22 @@ layout: default
 {% if page.math %}
 <script>
   MathJax = {
-    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    tex: {
+      inlineMath:  [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      tags: 'ams',
+      macros: {
+        R: '{\\mathbb{R}}', N: '{\\mathbb{N}}', Z: '{\\mathbb{Z}}',
+        Q: '{\\mathbb{Q}}', C: '{\\mathbb{C}}', F: '{\\mathbb{F}}',
+        abs:  ['{\\left\\lvert #1 \\right\\rvert}', 1],
+        norm: ['{\\left\\lVert #1 \\right\\rVert}', 1],
+        set:  ['{\\left\\{ #1 \\right\\}}', 1],
+        floor: ['{\\left\\lfloor #1 \\right\\rfloor}', 1],
+        ceil:  ['{\\left\\lceil #1 \\right\\rceil}', 1]
+      }
+    },
+    options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
     svg: { fontCache: 'global' }
   };
 </script>

@@ -200,6 +200,29 @@ const Defs = () => (
 );
 const COL = { ink: C.ink, syn: C.syn, str: C.str, soft: C.soft };
 
+/* A label that sits on a line. The halo is painted first, in the page
+   background colour, so the line is knocked out around the glyphs instead of
+   running through them. */
+const HALO = {
+  stroke: C.bg,
+  strokeWidth: 3.6,
+  strokeLinejoin: "round",
+  paintOrder: "stroke",
+};
+
+/* Figure captions carry inline code in backticks the way the prose does, but
+   SVG has no rich text, so the marks would render literally. Split the caption
+   and set the code runs as monospace tspans instead. */
+const Cap = ({ x, y, t, anchor = "middle", size = 13 }) => (
+  <text x={x} y={y} textAnchor={anchor} fontSize={size} fill={C.soft}>
+    {t.split(/`([^`]+)`/).map((s, i) =>
+      i % 2 === 1
+        ? <tspan key={i} fontFamily="ui-monospace,monospace" fill={C.ink}>{s}</tspan>
+        : <tspan key={i}>{s}</tspan>
+    )}
+  </text>
+);
+
 function Ar({ x1, y1, x2, y2, c = "ink", dash, bend = 0, label, lx = 0, ly = -7, both }) {
   const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
   const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
@@ -214,7 +237,7 @@ function Ar({ x1, y1, x2, y2, c = "ink", dash, bend = 0, label, lx = 0, ly = -7,
       />
       {label && (
         <text x={cx + lx} y={cy + ly} fill={COL[c]} fontSize="13" textAnchor="middle"
-          fontFamily="ui-monospace,monospace">{label}</text>
+          fontFamily="ui-monospace,monospace" {...HALO}>{label}</text>
       )}
     </g>
   );
@@ -226,7 +249,7 @@ const Ob = ({ x, y, t, c = "ink", size = 15, anchor = "middle" }) => (
 const Dot = ({ x, y, c = "ink", r = 3.4 }) => <circle cx={x} cy={y} r={r} fill={COL[c]} />;
 
 /* ---------- the figures ---------- */
-function Figure({ kind }) {
+export function Figure({ kind }) {
   const S = (w, h, ch) => (
     <svg viewBox={`0 0 ${w} ${h}`} role="img"><Defs />{ch}</svg>
   );
@@ -234,14 +257,15 @@ function Figure({ kind }) {
     case "monoid":
       return S(400, 200, <>
         <Dot x={200} y={120} r={4.5} />
-        <text x={200} y={148} textAnchor="middle" fontSize="13" fill={C.soft} fontFamily="ui-monospace,monospace">one object: •</text>
         <path d="M200,120 C120,120 120,40 200,44" fill="none" stroke={C.syn} strokeWidth="1.3" markerEnd="url(#a-syn)" />
         <path d="M200,120 C280,120 280,40 200,44" fill="none" stroke={C.str} strokeWidth="1.3" markerEnd="url(#a-str)" />
         <path d="M200,120 C260,178 140,178 200,120" fill="none" stroke={C.soft} strokeWidth="1.3" markerEnd="url(#a-soft)" />
         <text x={128} y={72} fontSize="13" fill={C.syn} fontFamily="ui-monospace,monospace">m</text>
         <text x={262} y={72} fontSize="13" fill={C.str} fontFamily="ui-monospace,monospace">n</text>
         <text x={200} y={40} textAnchor="middle" fontSize="13" fill={C.ink} fontFamily="ui-monospace,monospace">m · n</text>
-        <text x={200} y={192} textAnchor="middle" fontSize="13" fill={C.soft} fontFamily="ui-monospace,monospace">e = id</text>
+        {/* Both labels sit clear of the identity loop rather than inside it. */}
+        <text x={268} y={152} fontSize="13" fill={C.soft} fontFamily="ui-monospace,monospace">e = id</text>
+        <text x={200} y={196} textAnchor="middle" fontSize="13" fill={C.soft} fontFamily="ui-monospace,monospace" {...HALO}>one object: •</text>
       </>);
     case "judgment":
       return S(400, 190, <>
@@ -264,7 +288,7 @@ function Figure({ kind }) {
         <text x={200} y={83} textAnchor="middle" fontSize="13" fill={C.syn} fontFamily="ui-monospace,monospace">λx. body</text>
         <Ar x1={102} y1={78} x2={148} y2={78} label="a" ly={-8} />
         <Ar x1={250} y1={78} x2={296} y2={78} label="f a" ly={-8} />
-        <text x={200} y={140} textAnchor="middle" fontSize="13" fill={C.soft}>A term of type `A→B` is a black box:</text>
+        <Cap x={200} y={140} t="A term of type `A→B` is a black box:" />
         <text x={200} y={162} textAnchor="middle" fontSize="13" fill={C.soft} fontFamily="ui-monospace,monospace">(λx. t) a  ⟶β  t[a/x]</text>
       </>);
     case "prodsum":
@@ -298,11 +322,11 @@ function Figure({ kind }) {
         <Ar x1={90} y1={104} x2={112} y2={104} c="syn" />
         <Ar x1={174} y1={78} x2={196} y2={78} c="syn" />
         <Ar x1={258} y1={52} x2={280} y2={52} c="syn" />
-        <text x={200} y={176} textAnchor="middle" fontSize="13" fill={C.soft}>Every `ℕ` is reached exactly once - so recursion</text>
-        <text x={200} y={194} textAnchor="middle" fontSize="13" fill={C.soft}>on this staircase defines a total function.</text>
+        <Cap x={200} y={176} t="Every `ℕ` is reached exactly once - so recursion" />
+        <Cap x={200} y={194} t="on this staircase defines a total function." />
       </>);
     case "fibers":
-      return S(400, 210, <>
+      return S(400, 224, <>
         <line x1="40" y1="164" x2="360" y2="164" stroke={C.ink} strokeWidth="1.3" />
         <text x={370} y={168} fontSize="14" fill={C.ink} fontFamily='Palatino,Georgia,serif' fontStyle="italic">A</text>
         {[0, 1, 2, 3].map((i) => {
@@ -318,8 +342,10 @@ function Figure({ kind }) {
             </g>
           );
         })}
-        <text x={40} y={30} fontSize="13" fill={C.soft}>A family `B : A → Type` - the type varies with the point.</text>
-        <text x={40} y={196} fontSize="13" fill={C.soft}>`Π(x:A) B x` picks one point per fiber; `Σ(x:A) B x` is the whole space.</text>
+        {/* Two lines: one run of this caption is wider than the viewBox. */}
+        <Cap x={200} y={30} t="A family `B : A → Type`: the type varies with the point." />
+        <Cap x={200} y={198} t="`Π(x:A) B x` picks one point per fiber;" />
+        <Cap x={200} y={216} t="`Σ(x:A) B x` is the whole space." />
       </>);
     case "category":
       return S(400, 210, <>
@@ -346,7 +372,7 @@ function Figure({ kind }) {
         <Dot x={346} y={140} c="str" /><Ob x={356} y={146} t="F B" c="str" anchor="start" />
         <Ar x1={282} y1={78} x2={340} y2={134} c="str" label="F f" lx={-14} ly={2} />
         <Ar x1={170} y1={105} x2={230} y2={105} c="soft" dash label="F" ly={-8} />
-        <text x={200} y={200} textAnchor="middle" fontSize="13" fill={C.soft}>`F(g ∘ f) = F g ∘ F f` and `F(id) = id`.</text>
+        <Cap x={200} y={200} t="`F(g ∘ f) = F g ∘ F f` and `F(id) = id`." />
       </>);
     case "naturality":
       return S(400, 200, <>
@@ -357,7 +383,7 @@ function Figure({ kind }) {
         <Ar x1={74} y1={62} x2={74} y2={140} c="syn" label="F f" lx={-26} ly={4} />
         <Ar x1={294} y1={62} x2={294} y2={140} c="str" label="G f" lx={26} ly={4} />
         <text x={190} y={104} textAnchor="middle" fontSize="20" fill={C.soft}>⟳</text>
-        <text x={200} y={192} textAnchor="middle" fontSize="13" fill={C.soft}>One square per morphism `f : X → Y`; all of them commute.</text>
+        <Cap x={200} y={192} t="One square per morphism `f : X → Y`; all of them commute." />
       </>);
     case "cone":
       return S(400, 210, <>
@@ -369,7 +395,7 @@ function Figure({ kind }) {
         <Ar x1={216} y1={126} x2={328} y2={168} label="π₂" lx={8} ly={-6} />
         <Ar x1={190} y1={46} x2={62} y2={166} c="soft" bend={26} label="f" lx={-16} ly={0} />
         <Ar x1={212} y1={46} x2={338} y2={166} c="soft" bend={-26} label="g" lx={16} ly={0} />
-        <text x={200} y={202} textAnchor="middle" fontSize="13" fill={C.soft}>Any pair `(f, g)` factors through `A × B` in exactly one way.</text>
+        <Cap x={200} y={202} t="Any pair `(f, g)` factors through `A × B` in exactly one way." />
       </>);
     case "adjunction":
       return S(400, 200, <>
@@ -378,7 +404,7 @@ function Figure({ kind }) {
         <rect x="230" y="46" width="150" height="52" fill={C.panel} stroke={C.rule} />
         <text x={305} y={78} textAnchor="middle" fontSize="13.5" fill={C.ink} fontFamily="ui-monospace,monospace">𝒞(A, G B)</text>
         <Ar x1={176} y1={72} x2={224} y2={72} c="syn" both label="≅" ly={-9} />
-        <text x={200} y={124} textAnchor="middle" fontSize="13" fill={C.soft}>natural in both `A` and `B`</text>
+        <Cap x={200} y={124} t="natural in both `A` and `B`" />
         <Ar x1={110} y1={158} x2={290} y2={158} c="str" label="F  (left)" ly={-8} />
         <Ar x1={290} y1={182} x2={110} y2={182} c="str" label="G  (right)" ly={16} />
       </>);
@@ -455,7 +481,7 @@ const NODES = [
     examples: [
       { h: "Numbers", b: "`(ℕ, +, 0)` and `(ℕ, ×, 1)` are commutative monoids. Neither is a group: `3` has no additive inverse in `ℕ`." },
       { h: "Strings", b: "`(Σ*, concatenation, \"\")` - the *free* monoid on the alphabet `Σ`. Free means: no relations hold beyond the ones the laws force. This is exactly what a “free construction” will mean later." },
-      { h: "Functions", b: "For any set `X`, the endofunctions `X → X` under composition with `id_X` as unit. Non-commutative, and the source of the arrow picture above." },
+      { h: "Functions", b: "For any set `X`, its *endomorphisms*: the functions `X → X`. An endomorphism is a map from a thing back to itself, so any two of them can always be composed - the output of one is a legal input to the next. Composition is associative and `id_X` leaves every function alone, so `(X → X, ∘, id_X)` is a monoid: every set quietly carries one. Non-commutative, and the source of the arrow picture above." },
       { h: "Not a monoid", b: "`(ℤ, −, 0)` fails: subtraction is not associative, since `(1−1)−1 = −1` but `1−(1−1) = 1`." },
       { h: "Booleans, twice", b: "`(Bool, ∧, true)` and `(Bool, ∨, false)`. Later these become the *product* and *coproduct* on a two-element poset - the same monoid laws, read as universal properties." },
     ],
@@ -1755,15 +1781,22 @@ function Graph({ done, isOpen, go }) {
             const y1 = p.y + NH / 2 + 2, y2 = q.y - NH / 2 - 2;
             const label = EDGE_LABEL[`${r}>${n.id}`];
             const vertical = p.x === q.x;
+            /* Diagonal edges: push the label clear of the arrow along the
+               perpendicular, always to the upper side, so it never reads as
+               struck through. Vertical edges: sit it beside the line. */
+            const dx = q.x - p.x, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+            let nx = -dy / len, ny = dx / len;
+            if (ny > 0) { nx = -nx; ny = -ny; }
+            const OFF = 14;
             return (
               <g key={`${r}-${n.id}`}>
                 <Ar x1={p.x} y1={y1} x2={q.x} y2={y2} c="soft" />
                 {label && (
                   <text
-                    x={(p.x + q.x) / 2 + (vertical ? 9 : 0)}
-                    y={(y1 + y2) / 2 + (vertical ? 4 : -6)}
+                    x={(p.x + q.x) / 2 + (vertical ? 9 : nx * OFF)}
+                    y={(y1 + y2) / 2 + 4 + (vertical ? 0 : ny * OFF)}
                     fontSize="11" fill={C.soft} textAnchor={vertical ? "start" : "middle"}
-                    fontFamily="ui-monospace,monospace"
+                    fontFamily="ui-monospace,monospace" {...HALO}
                   >{label}</text>
                 )}
               </g>
@@ -1779,10 +1812,13 @@ function Graph({ done, isOpen, go }) {
               role="button" aria-label={n.title}
               onClick={() => open && go(n.id)}
               onKeyDown={(e) => { if (open && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); go(n.id); } }}>
+              {/* Locked boxes keep a faint fill so their titles sit on paper
+                  rather than on the page grid, and a muted track stripe so the
+                  two tracks are legible before anything is unlocked. */}
               <rect className="box" x={x} y={y} width={NW} height={NH} rx="2"
-                fill={open ? C.panel : "none"} stroke={fin ? tc : open ? C.ink : C.rule}
+                fill={open ? C.panel : "rgba(252,253,254,.62)"} stroke={fin ? tc : open ? C.ink : C.rule}
                 strokeWidth={fin ? 1.5 : 1} strokeDasharray={open ? undefined : "4 3"} />
-              {open && <rect x={x} y={y} width="3" height={NH} fill={tc} />}
+              <rect x={x} y={y} width="3" height={NH} fill={tc} opacity={open ? 1 : 0.3} />
               <text x={x + 14} y={y + 22} fontSize="13.5" fill={open ? C.ink : C.soft}
                 fontFamily='"Iowan Old Style",Palatino,Georgia,serif'>{n.short[0]}</text>
               <text x={x + 14} y={y + 39} fontSize="13.5" fill={open ? C.ink : C.soft}

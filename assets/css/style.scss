@@ -292,6 +292,100 @@ main.container {
   }
 }
 
+// ── Math: theorem environments ─────────────────────────────────────────────
+$thm-plain:  $accent;   // theorem, lemma, proposition, corollary
+$thm-def:    #3fb950;   // definition
+$thm-conj:   #d29922;   // conjecture, question
+$thm-note:   $text-muted; // remark, example
+
+.post-content {
+  counter-reset: thm;
+
+  // Numbered environments share one counter, as in most papers.
+  .thm {
+    counter-increment: thm;
+    position: relative;
+    margin: 1.75rem 0;
+    padding: 1rem 1.25rem;
+    background: $surface;
+    border: 1px solid $border;
+    border-left: 3px solid $thm-plain;
+    border-radius: 0 8px 8px 0;
+
+    > :last-child { margin-bottom: 0; }
+  }
+
+  .thm-head {
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+    color: $thm-plain;
+    letter-spacing: -0.01em;
+  }
+
+  .thm-kind::after { content: " " counter(thm) "."; }
+
+  .thm-title {
+    font-weight: 400;
+    color: $text-muted;
+  }
+
+  // Plain style: statement set in italics (AMS convention).
+  .thm--theorem, .thm--lemma, .thm--proposition, .thm--corollary, .thm--claim {
+    p, li { font-style: italic; }
+  }
+
+  .thm--definition {
+    border-left-color: $thm-def;
+    .thm-head { color: $thm-def; }
+  }
+
+  .thm--conjecture, .thm--question, .thm--problem {
+    border-left-color: $thm-conj;
+    .thm-head { color: $thm-conj; }
+    p, li { font-style: italic; }
+  }
+
+  .thm--remark, .thm--example, .thm--notation {
+    border-left-color: $thm-note;
+    .thm-head { color: $text-muted; }
+  }
+
+  // Proof: unnumbered, no box, ends with a QED tombstone.
+  .thm--proof {
+    counter-increment: none;
+    background: none;
+    border: none;
+    border-left: 1px solid $border;
+    border-radius: 0;
+    padding: 0.15rem 0 0.15rem 1.25rem;
+
+    .thm-head {
+      display: inline;
+      color: $text-muted;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .thm-kind::after { content: "."; }
+
+    .thm-head + p { display: inline; }
+
+    > :last-child::after {
+      content: "\25A1";           // □
+      float: right;
+      margin-left: 0.5rem;
+      color: $text-muted;
+    }
+  }
+
+  // Long display equations should scroll, not blow out the page on mobile.
+  mjx-container[display="true"] {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.25rem 0;
+  }
+}
+
 // ── Post footer ────────────────────────────────────────────────────────────
 .post-footer {
   margin-top: 3rem;

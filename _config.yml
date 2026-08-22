@@ -18,3 +18,4 @@ exclude:
   - Gemfile.lock
   - vendor
   - .bundle
+  - serve.sh   # local preview launcher; _dev/ is excluded automatically

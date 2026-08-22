@@ -1,0 +1,3 @@
+{%- assign kind = include.type | default: "theorem" -%}
+<div class="thm thm--{{ kind }}"{% if include.id %} id="{{ include.id }}"{% endif %} markdown="1">
+<p class="thm-head"><span class="thm-kind">{{ include.label | default: kind | capitalize }}</span>{%- if include.title %} <span class="thm-title">({{ include.title }})</span>{%- endif %}</p>
