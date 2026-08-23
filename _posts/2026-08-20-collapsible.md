@@ -2,7 +2,7 @@
 layout: post
 title: "On collapsible algebraic numbers"
 date: 2026-08-20
-last_modified_at: 2026-08-22
+last_modified_at: 2026-08-23
 math: true
 ---
 
@@ -22,7 +22,7 @@ The case for cubics was solved by Jordi Ribes:
 
 The open question is what happens in the case $\deg \alpha \geq 4$.
 
-Rather than working with the question in this form, we begin by constructing a more precise formulation of the problem. First we define a common term to describe how the roots of a polynomial behave.
+We first restate the problem in a more workable form, beginning with a name for the polynomials it allows.
 
 {% include thm.html type="definition" title="Split" id="def-split" %}
 A polynomial $f \in \Q[x]$ is *split* if $\deg f \geq 1$ and
@@ -59,8 +59,6 @@ By [the lemma](#lem-target), Problem 3 asks precisely whether every algebraic
 number is eventually collapsible.
 {% include endthm.html %}
 
-We are now ready to prove our first new result.
-
 {% include thm.html type="theorem" title="Trinomials are $2$-collapsible" id="thm-trinomial" %}
 Let $\alpha$ be an algebraic number satisfying
 $$\alpha^n + q\alpha^k + r = 0$$
@@ -95,17 +93,77 @@ for which $\alpha$ does there exist a polynomial $f\in \Q[x]$ that splits in $\Q
 The cases $\deg \alpha\leq 2$ are already covered by the previously known results stated above.
 But the case $\deg \alpha = 3$ is currently open.
 
-{% include thm.html type="lemma" title="Product form" id="lem-product" %}
-Let $\alpha$ be an irrational algebraic number. Then $\alpha$ is collapsible if and only if
-there are $n \geq 1$ and $r_1,\ldots,r_n \in \Q$ with
-$$\prod_{i=1}^n (\alpha - r_i) \in \Q^\times.$$
+When the minimal polynomial has a convenient shape, collapsibility can be exhibited by hand.
+Suppose $\alpha^3 - s^2\alpha + C = 0$ for some $s \in \Q$, and take the split polynomial with roots
+$0, s, -s$:
+
+$$f(x) = x(x-s)(x+s) = x^3 - s^2 x, \qquad f(\alpha) = -C \in \Q .$$
+
+Or suppose $\alpha^3 - 3\alpha + C = 0$; then the roots $1,1,-2$ do the same job:
+
+$$f(x) = (x-1)^2(x+2) = x^3 - 3x + 2, \qquad f(\alpha) = 2 - C \in \Q .$$
+
+Neither computation used anything about $\alpha$ beyond its minimal polynomial $m$, and in both cases
+$f$ was rigged so that $f - m$ is a rational constant. That is forced rather than lucky: $m$ generates
+the ideal of polynomials vanishing at $\alpha$, so $f(\alpha) = c$ holds exactly when $m$ divides
+$f - c$. Collapsibility of $\alpha$ is therefore a statement about $m$ alone,
+
+$$\alpha \text{ is collapsible} \iff mh + c \text{ is split for some } h \in \Q[x]\setminus\{0\},\ c \in \Q,$$
+
+and the search for $f$ is a search for a rational root set whose elementary symmetric functions match
+the coefficients of such an $mh + c$.
+
+## The cubic case
+
+Before specialising into the cubic case, we show that collapsibility only sees $\alpha$ up to an affine change of variable.
+
+{% include thm.html type="lemma" title="Affine invariance" id="lem-affine" %}
+Let $\alpha$ be an algebraic number, $\lambda \in \Q^\times$ and $b \in \Q$. Then $\alpha$ is
+collapsible if and only if $\lambda\alpha + b$ is.
 {% include endthm.html %}
 
 {% include thm.html type="proof" %}
-A split $f$ is by definition $f(x) = a\prod_{i=1}^n(x-r_i)$ with $a \in \Q^\times$, $r_i \in \Q$ and
-$n = \deg f \geq 1$, so $f(\alpha) = a\prod_i(\alpha-r_i)$. Multiplying by the unit $a$ does not
-affect membership in $\Q$, and every factor is nonzero since $\alpha \notin \Q$. Conversely, such a
-product is $f(\alpha)$ for the split polynomial $f(x) = \prod_{i=1}^n(x-r_i)$.
+Let $f(x) = a\prod_{i=1}^n(x-r_i)$ be split with $f(\alpha) \in \Q$, and set
+$g(x) = f\big((x-b)/\lambda\big)$. Then
+
+$$g(x) = a\prod_{i=1}^n\Big(\tfrac{x-b}{\lambda} - r_i\Big)
+       = a\lambda^{-n}\prod_{i=1}^n\big(x - (\lambda r_i + b)\big),$$
+
+so $g$ is split of the same degree $n \geq 1$, with rational roots $\lambda r_i + b$ and leading
+coefficient $a\lambda^{-n} \in \Q^\times$, and $g(\lambda\alpha + b) = f(\alpha) \in \Q$. The converse
+is the same argument applied to $\lambda^{-1}$ and $-b/\lambda$, which invert $x \mapsto \lambda x + b$.
 {% include endthm.html %}
 
-We can prove collapsibility for certain algebraic numbers without much effort, for example consider $\alpha-s^2x+C$ where $s\in \Q$. Then let the roots of the polynomial be $r=0,s,-s$, so $f(x)=x(x-s)(x+s)=x^2-s^2x=-C$. And collapsing $\alpha^3-3\alpha+C$, can be done with $r=-1,-1,2$, so $f(x)=(x-2)(x+1)^2=x^3-3x+2=2-C$.
+Writing $m(x) = x^3+ax^2+bx+c$, the lemma lets us replace $\alpha$ by $\alpha + a/3$: the roots of the
+new minimal polynomial sum to $-a + 3\cdot\tfrac{a}{3} = 0$, so it is *depressed*,
+
+$$m(x) = x^3 + dx + e .$$
+
+{% include thm.html type="lemma" title="Cubic criterion" id="lem-cubic" %}
+Let $\alpha$ have minimal polynomial $m(x) = x^3+dx+e$. There is a split $f$ of degree $3$ with
+$f(\alpha)\in\Q$ if and only if
+
+$$-d = \rho_1^2 + \rho_1\rho_2 + \rho_2^2 \qquad\text{for some } \rho_1,\rho_2 \in \Q.$$
+
+In that case $f(x) = (x-\rho_1)(x-\rho_2)(x+\rho_1+\rho_2)$ and
+$f(\alpha) = \rho_1\rho_2(\rho_1+\rho_2) - e$.
+{% include endthm.html %}
+
+{% include thm.html type="proof" %}
+Suppose $f$ is split of degree $3$ with $f(\alpha) \in \Q$. Dividing by its leading coefficient we
+may take $f$ monic, and we may write $f(\alpha) = c$. Then $f - c$ is monic of degree $3$ and
+vanishes at $\alpha$, so it is divisible by $m$; comparing degrees, $f = m + c$. Writing
+$f = \prod_{i=1}^3 (x-\rho_i)$ with $\rho_i \in \Q$ and comparing coefficients with
+$m + c = x^3 + dx + (e+c)$ gives
+
+$$\rho_1+\rho_2+\rho_3 = 0, \qquad \rho_1\rho_2+\rho_1\rho_3+\rho_2\rho_3 = d.$$
+
+Substituting $\rho_3 = -(\rho_1+\rho_2)$ into the second equation turns it into
+$-(\rho_1^2+\rho_1\rho_2+\rho_2^2) = d$.
+
+Conversely, given such $\rho_1,\rho_2$, set $\rho_3 = -(\rho_1+\rho_2)$ and
+$f = \prod_{i=1}^3(x-\rho_i)$. Then $f$ is split, its $x^2$-coefficient vanishes and its
+$x$-coefficient is $d$, so $f - m$ is the constant $-\rho_1\rho_2\rho_3 - e$, whence
+$f(\alpha) = f(\alpha)-m(\alpha) = \rho_1\rho_2(\rho_1+\rho_2)-e \in \Q$.
+{% include endthm.html %}
+
