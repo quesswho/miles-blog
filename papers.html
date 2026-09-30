@@ -1,0 +1,29 @@
+---
+layout: default
+title: Papers
+permalink: /papers/
+---
+<div class="home">
+  {%- assign papers = site.data.papers | sort: "date" | reverse -%}
+  {%- if papers.size > 0 -%}
+  <ul class="post-list">
+    {%- for paper in papers -%}
+    <li class="post-card">
+      <a href="{{ site.baseurl }}/assets/papers/{{ paper.file }}" class="post-card-link">
+        <div class="post-meta">
+          <time datetime="{{ paper.date | date_to_xmlschema }}">{{ paper.date | date: "%b %-d, %Y" }}</time>
+          {%- if paper.venue %} - {{ paper.venue | escape }}{% endif -%}
+          {%- if paper.authors %} - {{ paper.authors | escape }}{% endif -%}
+        </div>
+        <h2 class="post-title">{{ paper.title | escape }}</h2>
+        {%- if paper.abstract -%}
+        <p class="post-excerpt">{{ paper.abstract | escape }}</p>
+        {%- endif -%}
+      </a>
+    </li>
+    {%- endfor -%}
+  </ul>
+  {%- else -%}
+  <p class="no-posts">No papers yet.</p>
+  {%- endif -%}
+</div>
